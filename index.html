@@ -34,29 +34,42 @@
 
                     marker.addEventListener('markerLost', function () {
                         this.vid.pause();
+                        this.vid.currentTime = 0;
+                    }.bind(this));
+                },
+            });
+
+            AFRAME.registerComponent('modelhandler', {
+                init: function () {
+                    var marker = this.el;
+                    var modelId = this.el.getAttribute('model-id');
+                    this.model = document.querySelector(modelId);
+
+                    marker.addEventListener('markerFound', function () {
+                        this.model.setAttribute('visible', 'true');
+                    }.bind(this));
+
+                    marker.addEventListener('markerLost', function () {
+                        this.model.setAttribute('visible', 'false');
                     }.bind(this));
                 },
             });
 
             document.addEventListener('DOMContentLoaded', function () {
                 const startButton = document.getElementById('startButton');
-                const videos = [
-                    document.getElementById('vid1'),
-                    document.getElementById('vid2'),
-                    document.getElementById('vid3')
-                ];
+                const videos = [];
 
-                // ユーザーがスタートボタンをタップしたときの処理
+                for (let i = 1; i <= 22; i++) {
+                    videos.push(document.getElementById(`vid${i}`));
+                }
+
                 startButton.addEventListener('click', function () {
-                    // ビデオをロード
                     videos.forEach(video => {
                         video.load();
-                        // ユーザー操作により再生を許可
                         video.play();
                         video.pause();
                     });
 
-                    // スタートボタンを非表示
                     startButton.style.display = 'none';
                 });
             });
@@ -70,116 +83,32 @@
             vr-mode-ui="enabled: false"
             loading-screen="enabled: false;"
             arjs='sourceType: webcam; debugUIEnabled: false;'
-            id="scene"
             embedded
             gesture-detector
         >
             <a-assets>
-                <video
-                    id="vid1"
-                    src="assets/asset1.mp4"
-                    preload="auto"
-                    loop
-                    crossorigin
-                    webkit-playsinline
-                    playsinline
-                ></video>
-                <video
-                    id="vid2"
-                    src="assets/asset2.mp4"
-                    preload="auto"
-                    loop
-                    crossorigin
-                    webkit-playsinline
-                    playsinline
-                ></video>
-                <video
-                    id="vid3"
-                    src="assets/asset3.mp4"
-                    preload="auto"
-                    loop
-                    crossorigin
-                    webkit-playsinline
-                    playsinline
-                ></video>
+                <!-- 22個のビデオアセット -->
+                <video id="vid1" src="assets/asset1.mp4" preload="auto" loop crossorigin playsinline></video>
+                <video id="vid2" src="assets/asset2.mp4" preload="auto" loop crossorigin playsinline></video>
+                <!-- 同様に、vid3 から vid22 まで追加 -->
+                <video id="vid22" src="assets/asset22.mp4" preload="auto" loop crossorigin playsinline></video>
+                
+                <!-- GLBモデルのアセット -->
+                <a-asset-item id="model23" src="assets/model.glb"></a-asset-item>
             </a-assets>
 
-            <!-- マーカー1 -->
-            <a-marker
-                type="pattern"
-                preset="custom"
-                url="assets/marker1.patt"
-                videohandler
-                video-id="#vid1"
-                smooth="true"
-                smoothCount="10"
-                smoothTolerance="0.01"
-                smoothThreshold="5"
-                raycaster="objects: .clickable"
-                emitevents="true"
-                cursor="fuse: false; rayOrigin: mouse;"
-                id="marker1"
-            >
-                <a-video
-                    src="#vid1"
-                    scale="1 1 1"
-                    position="0 0.1 0"
-                    rotation="-90 0 0"
-                    class="clickable"
-                    gesture-handler
-                ></a-video>
+            <!-- 22個のマーカー（ビデオ用） -->
+            <a-marker type="pattern" preset="custom" url="assets/marker1.patt" videohandler video-id="#vid1" id="marker1">
+                <a-video src="#vid1" scale="1 1 1" position="0 0.1 0" rotation="-90 0 0"></a-video>
             </a-marker>
-
-            <!-- マーカー2 -->
-            <a-marker
-                type="pattern"
-                preset="custom"
-                url="assets/marker2.patt"
-                videohandler
-                video-id="#vid2"
-                smooth="true"
-                smoothCount="10"
-                smoothTolerance="0.01"
-                smoothThreshold="5"
-                raycaster="objects: .clickable"
-                emitevents="true"
-                cursor="fuse: false; rayOrigin: mouse;"
-                id="marker2"
-            >
-                <a-video
-                    src="#vid2"
-                    scale="1 1 1"
-                    position="0 0.1 0"
-                    rotation="-90 0 0"
-                    class="clickable"
-                    gesture-handler
-                ></a-video>
+            <a-marker type="pattern" preset="custom" url="assets/marker2.patt" videohandler video-id="#vid2" id="marker2">
+                <a-video src="#vid2" scale="1 1 1" position="0 0.1 0" rotation="-90 0 0"></a-video>
             </a-marker>
+            <!-- 同様に、marker3 から marker22 まで追加 -->
 
-            <!-- マーカー3 -->
-            <a-marker
-                type="pattern"
-                preset="custom"
-                url="assets/marker3.patt"
-                videohandler
-                video-id="#vid3"
-                smooth="true"
-                smoothCount="10"
-                smoothTolerance="0.01"
-                smoothThreshold="5"
-                raycaster="objects: .clickable"
-                emitevents="true"
-                cursor="fuse: false; rayOrigin: mouse;"
-                id="marker3"
-            >
-                <a-video
-                    src="#vid3"
-                    scale="1 1 1"
-                    position="0 0.1 0"
-                    rotation="-90 0 0"
-                    class="clickable"
-                    gesture-handler
-                ></a-video>
+            <!-- GLBモデル用のマーカー -->
+            <a-marker type="pattern" preset="custom" url="assets/marker23.patt" modelhandler model-id="#model23" id="marker23">
+                <a-entity gltf-model="#model23" scale="0.5 0.5 0.5" position="0 0 0" rotation="0 0 0" visible="false"></a-entity>
             </a-marker>
 
             <a-entity camera></a-entity>
